@@ -6,812 +6,574 @@
 <title>Sales Machine Dashboard 2026</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <style>
-  :root { color-scheme: light; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #f0f2f5;
-    color: #1a1a2e;
-    font-size: 13px;
-  }
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; font-size: 13px; }
 
-  /* HEADER */
-  .header {
-    background: linear-gradient(135deg, #1a2744 0%, #2d4a8a 100%);
-    color: white;
-    padding: 18px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
-  .header .subtitle { font-size: 12px; opacity: 0.7; margin-top: 2px; }
-  .header .badge {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 20px;
-    padding: 5px 14px;
-    font-size: 12px;
-    font-weight: 600;
-  }
+.header { background: linear-gradient(135deg, #1a2744 0%, #2d4a8a 100%); color: white; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; }
+.header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.header .subtitle { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 600; }
+.badge.loading { animation: pulse 1.5s infinite; }
+.badge.error { background: rgba(239,68,68,0.3); border-color: rgba(239,68,68,0.5); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
-  /* LAYOUT */
-  .content { padding: 16px 20px; max-width: 1400px; margin: 0 auto; }
+.content { padding: 16px 20px; max-width: 1400px; margin: 0 auto; }
+.section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #6b7280; margin: 20px 0 10px; }
 
-  /* SECTION TITLES */
-  .section-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: #6b7280;
-    margin: 20px 0 10px;
-  }
+/* KPI */
+.kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 4px; }
+.kpi-card { background: white; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 3px solid #e5e7eb; }
+.kpi-card.blue{border-left-color:#3b82f6} .kpi-card.green{border-left-color:#10b981} .kpi-card.orange{border-left-color:#f59e0b} .kpi-card.purple{border-left-color:#8b5cf6} .kpi-card.red{border-left-color:#ef4444}
+.kpi-label { font-size: 11px; color: #6b7280; font-weight: 500; margin-bottom: 4px; }
+.kpi-value { font-size: 22px; font-weight: 700; color: #1a1a2e; line-height: 1; }
+.kpi-sub { font-size: 11px; color: #6b7280; margin-top: 4px; }
+.up{color:#10b981;font-weight:600} .down{color:#ef4444;font-weight:600}
 
-  /* KPI GRID */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin-bottom: 4px;
-  }
-  .kpi-card {
-    background: white;
-    border-radius: 10px;
-    padding: 14px 16px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    border-left: 3px solid #e5e7eb;
-  }
-  .kpi-card.blue { border-left-color: #3b82f6; }
-  .kpi-card.green { border-left-color: #10b981; }
-  .kpi-card.orange { border-left-color: #f59e0b; }
-  .kpi-card.purple { border-left-color: #8b5cf6; }
-  .kpi-card.red { border-left-color: #ef4444; }
-  .kpi-label { font-size: 11px; color: #6b7280; font-weight: 500; margin-bottom: 4px; }
-  .kpi-value { font-size: 22px; font-weight: 700; color: #1a1a2e; line-height: 1; }
-  .kpi-sub { font-size: 11px; color: #6b7280; margin-top: 4px; }
-  .kpi-sub .up { color: #10b981; font-weight: 600; }
-  .kpi-sub .down { color: #ef4444; font-weight: 600; }
+/* Charts */
+.charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; }
+.chart-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.chart-card h3 { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 12px; }
+.chart-wrapper { position: relative; height: 200px; }
 
-  /* CHARTS ROW */
-  .charts-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  .chart-card {
-    background: white;
-    border-radius: 10px;
-    padding: 16px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  .chart-card h3 {
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 12px;
-  }
-  .chart-wrapper { position: relative; height: 200px; }
+/* Salesperson cards */
+.sp-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 12px; }
+.sp-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+.sp-header { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: white; }
+.sp-header.diogo{background:linear-gradient(135deg,#1e40af,#3b82f6)} .sp-header.flavia{background:linear-gradient(135deg,#7c3aed,#a78bfa)} .sp-header.goncalo{background:linear-gradient(135deg,#065f46,#10b981)}
+.sp-name { font-size: 14px; font-weight: 700; }
+.sp-body { padding: 12px 14px; }
 
-  /* SALESPERSON PANELS */
-  .sp-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  .sp-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    overflow: hidden;
-  }
-  .sp-header {
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: white;
-  }
-  .sp-header.diogo { background: linear-gradient(135deg, #1e40af, #3b82f6); }
-  .sp-header.flavia { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
-  .sp-header.goncalo { background: linear-gradient(135deg, #065f46, #10b981); }
-  .sp-name { font-size: 14px; font-weight: 700; }
-  .sp-rev { font-size: 13px; font-weight: 600; opacity: 0.9; }
-  .sp-body { padding: 12px 14px; }
+/* Funnel rows */
+.funnel-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f3f4f6; }
+.funnel-row:last-child { border-bottom: none; }
+.funnel-label { font-size: 11px; color: #6b7280; width: 100px; }
+.funnel-bar-wrap { flex: 1; margin: 0 8px; height: 8px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
+.funnel-bar { height: 100%; border-radius: 4px; }
+.funnel-vals { font-size: 11px; font-weight: 600; color: #374151; width: 80px; text-align: right; white-space: nowrap; }
+.funnel-goal { font-size: 10px; color: #9ca3af; margin-left: 3px; }
+.goal-pct { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+.goal-pct.good{background:#d1fae5;color:#065f46} .goal-pct.warn{background:#fef3c7;color:#92400e} .goal-pct.bad{background:#fee2e2;color:#991b1b}
+.divider { height: 1px; background: #f3f4f6; margin: 8px 0; }
 
-  /* FUNNEL */
-  .funnel-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px 0;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .funnel-row:last-child { border-bottom: none; }
-  .funnel-label { font-size: 11px; color: #6b7280; width: 100px; }
-  .funnel-bar-wrap { flex: 1; margin: 0 8px; height: 8px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
-  .funnel-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
-  .funnel-vals { font-size: 11px; font-weight: 600; color: #374151; width: 80px; text-align: right; white-space: nowrap; }
-  .funnel-goal { font-size: 10px; color: #9ca3af; margin-left: 4px; }
+/* Bottom row */
+.bottom-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+table { width: 100%; border-collapse: collapse; }
+th { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #9ca3af; padding: 5px 8px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+td { padding: 6px 8px; font-size: 12px; color: #374151; border-bottom: 1px solid #f3f4f6; }
+tr:last-child td { border-bottom: none; }
+.td-right{text-align:right} .td-center{text-align:center}
+.level{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700}
+.level-c1{background:#e0f2fe;color:#0369a1} .level-c2{background:#fef3c7;color:#b45309} .level-c3{background:#f3e8ff;color:#7c3aed} .level-c4{background:#d1fae5;color:#065f46}
 
-  /* GOAL STATUS */
-  .goal-pct {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 10px;
-    font-size: 10px;
-    font-weight: 700;
-  }
-  .goal-pct.good { background: #d1fae5; color: #065f46; }
-  .goal-pct.warn { background: #fef3c7; color: #92400e; }
-  .goal-pct.bad  { background: #fee2e2; color: #991b1b; }
+/* Commission timeline */
+.q-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+.q-box { border-radius: 8px; padding: 8px; text-align: center; }
+.q-box.future { opacity: 0.45; }
+.q-period { font-size: 10px; color: #6b7280; margin-bottom: 2px; }
+.q-val { font-size: 15px; font-weight: 700; line-height: 1.2; }
+.q-detail { font-size: 10px; color: #6b7280; margin-top: 2px; }
 
-  /* ACTIVITY & COMMISSION */
-  .bottom-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  /* TABLE */
-  table { width: 100%; border-collapse: collapse; }
-  th { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #9ca3af; padding: 5px 8px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-  td { padding: 6px 8px; font-size: 12px; color: #374151; border-bottom: 1px solid #f3f4f6; }
-  tr:last-child td { border-bottom: none; }
-  .td-right { text-align: right; }
-  .td-center { text-align: center; }
-
-  /* MONTHLY BREAKDOWN TABLE */
-  .monthly-table-wrap { overflow-x: auto; }
-  .monthly-table th, .monthly-table td { font-size: 11px; padding: 4px 8px; }
-  .monthly-table .month-val { font-weight: 600; }
-
-  /* LEVEL BADGE */
-  .level { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
-  .level-c1 { background: #e0f2fe; color: #0369a1; }
-  .level-c2 { background: #fef3c7; color: #b45309; }
-  .level-c3 { background: #f3e8ff; color: #7c3aed; }
-  .level-c4 { background: #d1fae5; color: #065f46; }
-
-  /* ACTIVITY DOTS */
-  .act-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f3f4f6; }
-  .act-row:last-child { border-bottom: none; }
-  .act-label { font-size: 12px; color: #374151; }
-  .act-period { font-size: 10px; color: #9ca3af; }
-  .act-vals { font-size: 11px; font-weight: 600; color: #374151; }
-  .act-icon { margin-right: 4px; }
-
-  /* DIVIDER */
-  .divider { height: 1px; background: #f3f4f6; margin: 8px 0; }
-
-  /* PROGRESS RING */
-  .progress-rings {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 8px 0;
-  }
-  .ring-wrap { text-align: center; }
-  .ring-label { font-size: 10px; color: #6b7280; margin-top: 4px; }
-  .ring-val { font-size: 13px; font-weight: 700; }
-
-  /* TAB PILLS */
-  .tab-pills { display: flex; gap: 6px; margin-bottom: 10px; }
-  .tab-pill {
-    padding: 4px 12px;
-    border-radius: 20px;
-    border: 1px solid #e5e7eb;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    background: white;
-    color: #6b7280;
-    transition: all 0.15s;
-  }
-  .tab-pill.active { background: #1e40af; color: white; border-color: #1e40af; }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+/* Loading overlay */
+#loading-overlay { position:fixed; inset:0; background:rgba(240,242,245,0.85); display:flex; align-items:center; justify-content:center; z-index:100; flex-direction:column; gap:12px; }
+.spinner { width:36px; height:36px; border:3px solid #e5e7eb; border-top-color:#3b82f6; border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text { font-size:13px; color:#6b7280; font-weight:500; }
 </style>
 </head>
 <body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">A carregar dados da Sales Machine…</div>
+</div>
 
 <div class="header">
   <div>
     <h1>🏆 Sales Machine — Dashboard 2026</h1>
     <div class="subtitle">Equipa de Vendas · Maio 2026 (Mês 5 de 12)</div>
   </div>
-  <div class="badge">📅 Atualizado: Maio 2026</div>
+  <div class="header-right">
+    <div id="update-badge" class="badge loading">⏳ A carregar…</div>
+  </div>
 </div>
 
 <div class="content">
-
-  <!-- TOP KPIs -->
   <div class="section-title">Visão Geral da Equipa — YTD 2026</div>
-  <div class="kpi-grid">
-    <div class="kpi-card blue">
-      <div class="kpi-label">Revenue Total YTD</div>
-      <div class="kpi-value">€264.8K</div>
-      <div class="kpi-sub">Diogo €233K · Goncalo €21K · Flavia €11K</div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-label">New Business YTD</div>
-      <div class="kpi-value">€48.2K</div>
-      <div class="kpi-sub">Diogo €27.9K · Goncalo €12K · Flavia €8.3K</div>
-    </div>
-    <div class="kpi-card orange">
-      <div class="kpi-label">Deals Ganhos YTD</div>
-      <div class="kpi-value">1 473</div>
-      <div class="kpi-sub">Diogo 1019 · Goncalo 318 · Flavia 136</div>
-    </div>
-    <div class="kpi-card purple">
-      <div class="kpi-label">Comissões YTD</div>
-      <div class="kpi-value">€5 334</div>
-      <div class="kpi-sub">Diogo €4.291 · Goncalo €623 · Flavia €420</div>
-    </div>
-    <div class="kpi-card red">
-      <div class="kpi-label">Revenue — Maio 2026</div>
-      <div class="kpi-value">€9 277</div>
-      <div class="kpi-sub">vs Meta €27 000 &nbsp;<span class="down">34% atingido</span></div>
-    </div>
-  </div>
+  <div id="kpi-grid" class="kpi-grid"></div>
 
-  <!-- CHARTS ROW -->
   <div class="section-title">Evolução Mensal de Revenue</div>
   <div class="charts-row">
-    <div class="chart-card">
-      <h3>Revenue Mensal por Comercial (€) — 2026</h3>
-      <div class="chart-wrapper">
-        <canvas id="revenueChart"></canvas>
-      </div>
-    </div>
-    <div class="chart-card">
-      <h3>New Business vs Renovações — YTD Mix</h3>
-      <div class="chart-wrapper">
-        <canvas id="mixChart"></canvas>
-      </div>
-    </div>
+    <div class="chart-card"><h3>Revenue Mensal por Comercial (€) — 2026</h3><div class="chart-wrapper"><canvas id="revenueChart"></canvas></div></div>
+    <div class="chart-card"><h3>New Business vs Renovações — YTD Mix</h3><div class="chart-wrapper"><canvas id="mixChart"></canvas></div></div>
   </div>
 
-  <!-- WON DEALS CHART -->
-  <div class="charts-row" style="grid-template-columns: 1fr 1fr;">
-    <div class="chart-card">
-      <h3>Deals Ganhos por Mês — New Business</h3>
-      <div class="chart-wrapper">
-        <canvas id="dealsChart"></canvas>
-      </div>
-    </div>
-    <div class="chart-card">
-      <h3>Funil Maio 2026 — Leads vs Contactados vs Won</h3>
-      <div class="chart-wrapper">
-        <canvas id="funnelChart"></canvas>
-      </div>
-    </div>
+  <div class="charts-row" style="grid-template-columns:1fr 1fr;">
+    <div class="chart-card"><h3>Deals Ganhos por Mês — New Business</h3><div class="chart-wrapper"><canvas id="dealsChart"></canvas></div></div>
+    <div class="chart-card"><h3>Funil Maio 2026 — Leads vs Contactados vs Won</h3><div class="chart-wrapper"><canvas id="funnelChart"></canvas></div></div>
   </div>
 
-  <!-- SALESPERSON DETAIL — MAY 2026 -->
   <div class="section-title">Desempenho Individual — Maio 2026 vs Metas</div>
-  <div class="sp-grid">
+  <div id="sp-grid" class="sp-grid"></div>
 
-    <!-- DIOGO -->
-    <div class="sp-card">
-      <div class="sp-header diogo">
-        <div>
-          <div class="sp-name">Diogo Fernandes</div>
-          <div style="font-size:11px;opacity:0.8;margin-top:2px;">C2 · Comissão €690.87</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:18px;font-weight:700;">€6 102</div>
-          <span class="goal-pct warn">68% da meta</span>
-        </div>
-      </div>
-      <div class="sp-body">
-        <!-- Funnel rows: label / bar (actual vs goal) / values -->
-        <div class="funnel-row">
-          <div class="funnel-label">Leads Atrib.</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#3b82f6;"></div></div>
-          <div class="funnel-vals">109 <span class="funnel-goal">/ 109</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Contactados</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:77%;background:#3b82f6;"></div></div>
-          <div class="funnel-vals">75 <span class="funnel-goal">/ 98</span> <span class="goal-pct warn">77%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Conversas</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:80%;background:#60a5fa;"></div></div>
-          <div class="funnel-vals">55 <span class="funnel-goal">/ 69</span> <span class="goal-pct warn">80%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Qualificados</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:63%;background:#f59e0b;"></div></div>
-          <div class="funnel-vals">26 <span class="funnel-goal">/ 41</span> <span class="goal-pct warn">63%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Verbal Agreem.</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:15%;background:#ef4444;"></div></div>
-          <div class="funnel-vals">5 <span class="funnel-goal">/ 33</span> <span class="goal-pct bad">15%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Won</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:80%;background:#10b981;"></div></div>
-          <div class="funnel-vals">24 <span class="funnel-goal">/ 30</span> <span class="goal-pct good">80%</span></div>
-        </div>
-        <div class="divider"></div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-top:4px;">
-          <span>Avg Ticket: <strong>€254.25</strong> (meta €150)</span>
-          <span>Conversão: <strong>22.02%</strong></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- FLAVIA -->
-    <div class="sp-card">
-      <div class="sp-header flavia">
-        <div>
-          <div class="sp-name">Flávia Campos</div>
-          <div style="font-size:11px;opacity:0.8;margin-top:2px;">C1 · Comissão €109.70</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:18px;font-weight:700;">€2 183</div>
-          <span class="goal-pct bad">24% da meta</span>
-        </div>
-      </div>
-      <div class="sp-body">
-        <div class="funnel-row">
-          <div class="funnel-label">Leads Atrib.</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#8b5cf6;"></div></div>
-          <div class="funnel-vals">113 <span class="funnel-goal">/ 113</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Contactados</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:99%;background:#8b5cf6;"></div></div>
-          <div class="funnel-vals">101 <span class="funnel-goal">/ 102</span> <span class="goal-pct good">99%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Conversas</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:90%;background:#a78bfa;"></div></div>
-          <div class="funnel-vals">64 <span class="funnel-goal">/ 71</span> <span class="goal-pct good">90%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Qualificados</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:19%;background:#f59e0b;"></div></div>
-          <div class="funnel-vals">8 <span class="funnel-goal">/ 43</span> <span class="goal-pct bad">19%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Verbal Agreem.</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:0%;background:#ef4444;"></div></div>
-          <div class="funnel-vals">0 <span class="funnel-goal">/ 34</span> <span class="goal-pct bad">0%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Won</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:61%;background:#10b981;"></div></div>
-          <div class="funnel-vals">19 <span class="funnel-goal">/ 31</span> <span class="goal-pct warn">61%</span></div>
-        </div>
-        <div class="divider"></div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-top:4px;">
-          <span>Avg Ticket: <strong>€114.89</strong> (meta €150)</span>
-          <span>Conversão: <strong>16.81%</strong></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- GONCALO -->
-    <div class="sp-card">
-      <div class="sp-header goncalo">
-        <div>
-          <div class="sp-name">Gonçalo Centeno</div>
-          <div style="font-size:11px;opacity:0.8;margin-top:2px;">C1 · Comissão €53.52</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:18px;font-weight:700;">€992</div>
-          <span class="goal-pct bad">11% da meta</span>
-        </div>
-      </div>
-      <div class="sp-body">
-        <div class="funnel-row">
-          <div class="funnel-label">Leads Atrib.</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#10b981;"></div></div>
-          <div class="funnel-vals">104 <span class="funnel-goal">/ 104</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Contactados</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:96%;background:#10b981;"></div></div>
-          <div class="funnel-vals">90 <span class="funnel-goal">/ 94</span> <span class="goal-pct good">96%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Conversas</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:80%;background:#34d399;"></div></div>
-          <div class="funnel-vals">53 <span class="funnel-goal">/ 66</span> <span class="goal-pct warn">80%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Qualificados</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:15%;background:#f59e0b;"></div></div>
-          <div class="funnel-vals">6 <span class="funnel-goal">/ 40</span> <span class="goal-pct bad">15%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Verbal Agreem.</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:6%;background:#ef4444;"></div></div>
-          <div class="funnel-vals">2 <span class="funnel-goal">/ 32</span> <span class="goal-pct bad">6%</span></div>
-        </div>
-        <div class="funnel-row">
-          <div class="funnel-label">Won</div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:62%;background:#10b981;"></div></div>
-          <div class="funnel-vals">18 <span class="funnel-goal">/ 29</span> <span class="goal-pct warn">62%</span></div>
-        </div>
-        <div class="divider"></div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-top:4px;">
-          <span>Avg Ticket: <strong>€55.11</strong> (meta €150)</span>
-          <span>Conversão: <strong>17.31%</strong></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- BOTTOM ROW: Atividade + Comissões + Monthly Table -->
   <div class="bottom-row">
-
-    <!-- ATIVIDADE HOJE -->
-    <div class="chart-card">
-      <h3>📞 Atividade Diária</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Comercial</th>
-            <th class="td-center">Período</th>
-            <th class="td-right">Calls</th>
-            <th class="td-right">WhatsApp</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>Diogo</strong></td><td class="td-center" style="color:#10b981;font-weight:600;">Hoje</td><td class="td-right">2</td><td class="td-right">0</td></tr>
-          <tr><td></td><td class="td-center" style="color:#6b7280;">Ontem</td><td class="td-right">23</td><td class="td-right">116</td></tr>
-          <tr><td></td><td class="td-center" style="color:#6b7280;">Este Mês</td><td class="td-right font-bold">185</td><td class="td-right font-bold">694</td></tr>
-          <tr><td colspan="4" style="padding:4px 0;"><div class="divider"></div></td></tr>
-          <tr><td><strong>Flávia</strong></td><td class="td-center" style="color:#10b981;font-weight:600;">Hoje</td><td class="td-right">5</td><td class="td-right">0</td></tr>
-          <tr><td></td><td class="td-center" style="color:#6b7280;">Ontem</td><td class="td-right">81</td><td class="td-right">65</td></tr>
-          <tr><td></td><td class="td-center" style="color:#6b7280;">Este Mês</td><td class="td-right">347</td><td class="td-right">326</td></tr>
-          <tr><td colspan="4" style="padding:4px 0;"><div class="divider"></div></td></tr>
-          <tr><td><strong>Gonçalo</strong></td><td class="td-center" style="color:#10b981;font-weight:600;">Hoje</td><td class="td-right">2</td><td class="td-right">0</td></tr>
-          <tr><td></td><td class="td-center" style="color:#6b7280;">Ontem</td><td class="td-right">72</td><td class="td-right">68</td></tr>
-          <tr><td></td><td class="td-center" style="color:#6b7280;">Este Mês</td><td class="td-right">296</td><td class="td-right">551</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- COMISSÕES -->
-    <div class="chart-card">
-      <h3>💰 Comissões 2026</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Comercial</th>
-            <th>Nível</th>
-            <th class="td-right">NB</th>
-            <th class="td-right">Renovações</th>
-            <th class="td-right">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Diogo</strong></td>
-            <td><span class="level level-c2">C2</span></td>
-            <td class="td-right">€3 265</td>
-            <td class="td-right">€1 026</td>
-            <td class="td-right"><strong>€4 291</strong></td>
-          </tr>
-          <tr>
-            <td><strong>Gonçalo</strong></td>
-            <td><span class="level level-c1">C1</span></td>
-            <td class="td-right">€600</td>
-            <td class="td-right">€23</td>
-            <td class="td-right"><strong>€623</strong></td>
-          </tr>
-          <tr>
-            <td><strong>Flávia</strong></td>
-            <td><span class="level level-c1">C1</span></td>
-            <td class="td-right">€415</td>
-            <td class="td-right">€6</td>
-            <td class="td-right"><strong>€420</strong></td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="divider" style="margin-top:8px;"></div>
-      <div class="section-title" style="margin-top:8px;">Eficiência Laboral (Revenue/€ salário)</div>
-      <table>
-        <thead>
-          <tr><th>Comercial</th><th class="td-right">Jan</th><th class="td-right">Fev</th><th class="td-right">Mar</th><th class="td-right">Abr</th><th class="td-right">Mai</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Diogo</td><td class="td-right">12.2</td><td class="td-right">13.6</td><td class="td-right">23.6</td><td class="td-right">17.6</td><td class="td-right" style="color:#ef4444;font-weight:600;">7.6</td></tr>
-          <tr><td>Gonçalo</td><td class="td-right">0.9</td><td class="td-right">1.7</td><td class="td-right">2.9</td><td class="td-right">3.1</td><td class="td-right">1.2</td></tr>
-          <tr><td>Flávia</td><td class="td-right">0.0</td><td class="td-right">0.1</td><td class="td-right">1.7</td><td class="td-right">1.7</td><td class="td-right">1.0</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- REVENUE BREAKDOWN TABLE -->
-    <div class="chart-card">
-      <h3>📊 Revenue Mensal — New Business (€)</h3>
-      <table class="monthly-table">
-        <thead>
-          <tr>
-            <th>Comercial</th>
-            <th class="td-right">Jan</th>
-            <th class="td-right">Fev</th>
-            <th class="td-right">Mar</th>
-            <th class="td-right">Abr</th>
-            <th class="td-right">Mai</th>
-            <th class="td-right">YTD</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="color:#1e40af;font-weight:600;">Diogo</td>
-            <td class="td-right">€1 323</td>
-            <td class="td-right">€12 615</td>
-            <td class="td-right">€4 945</td>
-            <td class="td-right">€2 945</td>
-            <td class="td-right">€6 102</td>
-            <td class="td-right"><strong>€27 929</strong></td>
-          </tr>
-          <tr>
-            <td style="color:#7c3aed;font-weight:600;">Flávia</td>
-            <td class="td-right">€0</td>
-            <td class="td-right">€194</td>
-            <td class="td-right">€2 873</td>
-            <td class="td-right">€3 041</td>
-            <td class="td-right">€2 183</td>
-            <td class="td-right"><strong>€8 291</strong></td>
-          </tr>
-          <tr>
-            <td style="color:#065f46;font-weight:600;">Gonçalo</td>
-            <td class="td-right">€1 793</td>
-            <td class="td-right">€1 980</td>
-            <td class="td-right">€3 517</td>
-            <td class="td-right">€3 713</td>
-            <td class="td-right">€992</td>
-            <td class="td-right"><strong>€11 995</strong></td>
-          </tr>
-          <tr style="background:#f9fafb;">
-            <td><strong>Total NB</strong></td>
-            <td class="td-right"><strong>€3 116</strong></td>
-            <td class="td-right"><strong>€14 789</strong></td>
-            <td class="td-right"><strong>€11 335</strong></td>
-            <td class="td-right"><strong>€9 699</strong></td>
-            <td class="td-right"><strong>€9 277</strong></td>
-            <td class="td-right"><strong>€48 215</strong></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="divider" style="margin-top:10px;"></div>
-      <div class="section-title" style="margin-top:8px;">Deals Ganhos — NB por Mês</div>
-      <table class="monthly-table">
-        <thead>
-          <tr><th>Comercial</th><th class="td-right">Jan</th><th class="td-right">Fev</th><th class="td-right">Mar</th><th class="td-right">Abr</th><th class="td-right">Mai</th><th class="td-right">YTD</th></tr>
-        </thead>
-        <tbody>
-          <tr><td style="color:#1e40af;font-weight:600;">Diogo</td><td class="td-right">11</td><td class="td-right">48</td><td class="td-right">44</td><td class="td-right">27</td><td class="td-right">24</td><td class="td-right"><strong>154</strong></td></tr>
-          <tr><td style="color:#7c3aed;font-weight:600;">Flávia</td><td class="td-right">0</td><td class="td-right">3</td><td class="td-right">30</td><td class="td-right">44</td><td class="td-right">19</td><td class="td-right"><strong>96</strong></td></tr>
-          <tr><td style="color:#065f46;font-weight:600;">Gonçalo</td><td class="td-right">20</td><td class="td-right">30</td><td class="td-right">40</td><td class="td-right">46</td><td class="td-right">18</td><td class="td-right"><strong>154</strong></td></tr>
-        </tbody>
-      </table>
-    </div>
-
+    <div class="chart-card"><h3>📞 Atividade Diária</h3><div id="activity-table"></div></div>
+    <div class="chart-card"><h3>💰 Comissões 2026</h3><div id="commission-table"></div></div>
+    <div class="chart-card"><h3>📊 Revenue Mensal — New Business (€)</h3><div id="monthly-table"></div></div>
   </div>
 
-  <!-- FUNNEL YTD -->
-  <div class="section-title">Funil de Vendas YTD — Leads Atribuídos → Won (New Business)</div>
-  <div class="sp-grid">
-    <div class="chart-card">
-      <h3>Diogo Fernandes — Funil YTD</h3>
-      <div class="funnel-row"><div class="funnel-label">Leads Atrib.</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#3b82f6;"></div></div><div class="funnel-vals">1 074</div></div>
-      <div class="funnel-row"><div class="funnel-label">Contactados</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:59%;background:#3b82f6;"></div></div><div class="funnel-vals">634 <span class="funnel-goal">59%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Conversas</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:36%;background:#60a5fa;"></div></div><div class="funnel-vals">391 <span class="funnel-goal">36%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Qualificados</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:23%;background:#f59e0b;"></div></div><div class="funnel-vals">252 <span class="funnel-goal">23%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Verbal Agr.</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:1%;background:#ef4444;"></div></div><div class="funnel-vals">6 <span class="funnel-goal">0.6%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Won</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:14%;background:#10b981;"></div></div><div class="funnel-vals">154 <span class="funnel-goal">14.3%</span></div></div>
-    </div>
-    <div class="chart-card">
-      <h3>Flávia Campos — Funil YTD</h3>
-      <div class="funnel-row"><div class="funnel-label">Leads Atrib.</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#8b5cf6;"></div></div><div class="funnel-vals">1 035</div></div>
-      <div class="funnel-row"><div class="funnel-label">Contactados</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:70%;background:#8b5cf6;"></div></div><div class="funnel-vals">720 <span class="funnel-goal">70%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Conversas</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:39%;background:#a78bfa;"></div></div><div class="funnel-vals">404 <span class="funnel-goal">39%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Qualificados</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:12%;background:#f59e0b;"></div></div><div class="funnel-vals">123 <span class="funnel-goal">12%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Verbal Agr.</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2%;background:#ef4444;"></div></div><div class="funnel-vals">20 <span class="funnel-goal">1.9%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Won</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:9%;background:#10b981;"></div></div><div class="funnel-vals">96 <span class="funnel-goal">9.3%</span></div></div>
-    </div>
-    <div class="chart-card">
-      <h3>Gonçalo Centeno — Funil YTD</h3>
-      <div class="funnel-row"><div class="funnel-label">Leads Atrib.</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#10b981;"></div></div><div class="funnel-vals">2 766</div></div>
-      <div class="funnel-row"><div class="funnel-label">Contactados</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:59%;background:#10b981;"></div></div><div class="funnel-vals">1 629 <span class="funnel-goal">59%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Conversas</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:34%;background:#34d399;"></div></div><div class="funnel-vals">949 <span class="funnel-goal">34%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Qualificados</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:1%;background:#f59e0b;"></div></div><div class="funnel-vals">31 <span class="funnel-goal">1.1%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Verbal Agr.</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:1%;background:#ef4444;"></div></div><div class="funnel-vals">18 <span class="funnel-goal">0.7%</span></div></div>
-      <div class="funnel-row"><div class="funnel-label">Won</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:6%;background:#10b981;"></div></div><div class="funnel-vals">154 <span class="funnel-goal">5.6%</span></div></div>
-    </div>
-  </div>
+  <div class="section-title">Funil de Vendas YTD — Leads → Won (New Business)</div>
+  <div id="ytd-funnels" class="sp-grid"></div>
 
-</div><!-- /content -->
+  <div class="section-title">Timeline de Comissões por Trimestre — 2026</div>
+  <div class="charts-row" style="grid-template-columns:1.4fr 1.6fr; margin-bottom:12px;">
+    <div class="chart-card"><h3>Comissão Total por Trimestre (€)</h3><div class="chart-wrapper"><canvas id="commissionQChart"></canvas></div></div>
+    <div class="chart-card"><h3>Detalhe por Vendedor · NB vs Renovações</h3><div id="commission-detail"></div></div>
+  </div>
+</div>
 
 <script>
-// ---- REVENUE CHART ----
-const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai'];
-new Chart(document.getElementById('revenueChart'), {
-  type: 'bar',
-  data: {
-    labels: months,
-    datasets: [
-      {
-        label: 'Diogo (NB)',
-        data: [1323, 12615, 4945, 2945, 6102],
-        backgroundColor: '#3b82f6',
-        stack: 'nb'
-      },
-      {
-        label: 'Flávia (NB)',
-        data: [0, 194, 2873, 3041, 2183],
-        backgroundColor: '#8b5cf6',
-        stack: 'nb'
-      },
-      {
-        label: 'Gonçalo (NB)',
-        data: [1793, 1980, 3517, 3713, 992],
-        backgroundColor: '#10b981',
-        stack: 'nb'
-      },
-      {
-        label: 'Meta NB',
-        data: [27000/5, 27000/5, 27000/5, 27000/5, 27000],
-        type: 'line',
-        borderColor: '#ef4444',
-        borderDash: [4,4],
-        pointRadius: 4,
-        fill: false,
-        tension: 0,
-        stack: undefined,
-        order: -1
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12 } },
-      tooltip: {
-        callbacks: {
-          label: ctx => `${ctx.dataset.label}: €${ctx.parsed.y.toLocaleString('pt-PT')}`
-        }
-      }
-    },
-    scales: {
-      x: { stacked: true, ticks: { font: { size: 10 } } },
-      y: {
-        stacked: true,
-        ticks: {
-          font: { size: 10 },
-          callback: v => '€' + (v/1000).toFixed(0) + 'K'
-        }
-      }
-    }
-  }
-});
+// ─── CONFIGURAÇÃO ─────────────────────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwfqNzhHo3qlElA1g29pavQ9_TkBb82RTxsLp2W_h95234Z_pEgrxEmXnpJoyHfVhz3/exec';
 
-// ---- MIX CHART (Donut) ----
-new Chart(document.getElementById('mixChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['NB Diogo', 'NB Flávia', 'NB Gonçalo', 'Renovações Diogo', 'Renovações Gonçalo', 'Renovações Flávia'],
-    datasets: [{
-      data: [27929, 8291, 11995, 205158, 9212, 2225],
-      backgroundColor: ['#3b82f6','#8b5cf6','#10b981','#93c5fd','#6ee7b7','#c4b5fd'],
-      borderWidth: 1
-    }]
+// ─── DADOS DE FALLBACK (usados se o fetch falhar) ────────────────────────────
+const FALLBACK = {
+  today: {
+    diogo:   { today_calls:2,  today_wa:0,  yest_calls:23, yest_wa:116, month_calls:185, month_wa:694,  alltime_calls:1491, alltime_wa:1700 },
+    goncalo: { today_calls:2,  today_wa:0,  yest_calls:72, yest_wa:68,  month_calls:296, month_wa:551,  alltime_calls:5566, alltime_wa:2064 },
+    flavia:  { today_calls:5,  today_wa:0,  yest_calls:81, yest_wa:65,  month_calls:347, month_wa:326,  alltime_calls:2179, alltime_wa:1953 }
   },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: { font: { size: 9 }, boxWidth: 10, padding: 6 }
-      },
-      tooltip: {
-        callbacks: {
-          label: ctx => `${ctx.label}: €${ctx.parsed.toLocaleString('pt-PT')}`
+  optmax: {
+    diogo: {
+      'assigned leads': { result:109, goal:109, last_month:285, year:1074 },
+      'contacted':       { result:75,  goal:98,  last_month:232, year:634  },
+      'conversations':   { result:55,  goal:69,  last_month:167, year:391  },
+      'qualified':       { result:26,  goal:41,  last_month:114, year:252  },
+      'verbal agreement':{ result:5,   goal:33,  last_month:1,   year:6    },
+      'won':             { result:24,  goal:30,  last_month:27,  year:154  },
+      'revenue':         { result:6102,goal:9000,last_month:2945,year:28049 }
+    },
+    flavia: {
+      'assigned leads': { result:113, goal:113, last_month:389, year:1034 },
+      'contacted':       { result:101, goal:102, last_month:361, year:718  },
+      'conversations':   { result:64,  goal:71,  last_month:207, year:403  },
+      'qualified':       { result:8,   goal:43,  last_month:64,  year:123  },
+      'verbal agreement':{ result:0,   goal:34,  last_month:3,   year:20   },
+      'won':             { result:19,  goal:31,  last_month:44,  year:96   },
+      'revenue':         { result:2183,goal:9000,last_month:207, year:8598 }
+    },
+    goncalo: {
+      'assigned leads': { result:104, goal:104, last_month:330, year:2766 },
+      'contacted':       { result:90,  goal:94,  last_month:289, year:1629 },
+      'conversations':   { result:53,  goal:66,  last_month:180, year:948  },
+      'qualified':       { result:6,   goal:40,  last_month:16,  year:31   },
+      'verbal agreement':{ result:2,   goal:32,  last_month:15,  year:18   },
+      'won':             { result:18,  goal:29,  last_month:46,  year:154  },
+      'revenue':         { result:992, goal:9000,last_month:180, year:11995 }
+    }
+  },
+  ytd: {
+    diogo:   { ytd:{ revenue:28049, won:154 }, monthly:{ revenue:[1323,12615,4945,2945,6102,0,0,0,0,0,0,0], won:[11,48,44,27,24,0,0,0,0,0,0,0] } },
+    flavia:  { ytd:{ revenue:8598,  won:96  }, monthly:{ revenue:[0,194,2873,3041,2183,0,0,0,0,0,0,0],     won:[0,3,30,44,19,0,0,0,0,0,0,0]   } },
+    goncalo: { ytd:{ revenue:11995, won:154 }, monthly:{ revenue:[1793,1980,3517,3713,992,0,0,0,0,0,0,0],  won:[20,30,40,46,18,0,0,0,0,0,0,0]  } }
+  }
+};
+
+// ─── UTILITÁRIOS ─────────────────────────────────────────────────────────────
+const fmt = (n, dec=0) => typeof n==='number' ? n.toLocaleString('pt-PT',{minimumFractionDigits:dec,maximumFractionDigits:dec}) : n;
+const eur = (n) => '€ ' + fmt(n);
+const pct = (a,b) => b ? Math.round(a/b*100) : 0;
+const goalBadge = p => `<span class="goal-pct ${p>=90?'good':p>=60?'warn':'bad'}">${p}%</span>`;
+const barColor = p => p>=90?'#10b981':p>=60?'#f59e0b':'#ef4444';
+const safeGet = (obj,...keys) => keys.reduce((o,k) => (o&&o[k]!==undefined?o[k]:null), obj);
+
+let charts = {};
+
+// ─── FETCH ────────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  let data = FALLBACK;
+  let fromLive = false;
+
+  try {
+    const resp = await fetch(SCRIPT_URL);
+    if (resp.ok) {
+      const json = await resp.json();
+      if (!json.error) {
+        // Merge live data over fallback structure
+        if (json.today)  data = { ...data, today:  mergeToday(json.today, FALLBACK.today) };
+        if (json.optmax) data = { ...data, optmax: mergeOptmax(json.optmax, FALLBACK.optmax) };
+        if (json.ytd)    data = { ...data, ytd:    mergeYtd(json.ytd, FALLBACK.ytd) };
+        fromLive = true;
+      }
+    }
+  } catch(e) { /* silently fall back */ }
+
+  renderAll(data, fromLive);
+}
+
+function mergeToday(live, fallback) {
+  const out = {...fallback};
+  ['diogo','goncalo','flavia'].forEach(p => {
+    if (live[p] && Object.values(live[p]).some(v=>v>0)) out[p] = {...fallback[p], ...live[p]};
+  });
+  return out;
+}
+
+function mergeOptmax(live, fallback) {
+  const out = {...fallback};
+  ['diogo','goncalo','flavia'].forEach(p => {
+    if (live[p] && Object.keys(live[p]).length > 0) {
+      out[p] = {...fallback[p]};
+      Object.entries(live[p]).forEach(([k,v]) => {
+        const fk = Object.keys(fallback[p]).find(fkey => fkey.includes(k.split(' ')[0]));
+        if (fk) out[p][fk] = {...fallback[p][fk], ...v};
+      });
+    }
+  });
+  return out;
+}
+
+function mergeYtd(live, fallback) {
+  const out = {...fallback};
+  ['diogo','goncalo','flavia'].forEach(p => {
+    if (live[p]) {
+      const ytdRev = safeGet(live, p, 'ytd', 'revenue') || safeGet(live, p, 'ytd', 'Revenue');
+      const ytdWon = safeGet(live, p, 'ytd', 'won') || safeGet(live, p, 'ytd', 'Won');
+      const monRev = safeGet(live, p, 'monthly', 'revenue') || safeGet(live, p, 'monthly', 'Revenue');
+      const monWon = safeGet(live, p, 'monthly', 'won') || safeGet(live, p, 'monthly', 'Won');
+      out[p] = {
+        ytd: { revenue: ytdRev || fallback[p].ytd.revenue, won: ytdWon || fallback[p].ytd.won },
+        monthly: {
+          revenue: monRev || fallback[p].monthly.revenue,
+          won: monWon || fallback[p].monthly.won
         }
-      }
+      };
     }
-  }
-});
+  });
+  return out;
+}
 
-// ---- DEALS CHART ----
-new Chart(document.getElementById('dealsChart'), {
-  type: 'line',
-  data: {
-    labels: months,
-    datasets: [
-      {
-        label: 'Diogo',
-        data: [11, 48, 44, 27, 24],
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59,130,246,0.1)',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 4
-      },
-      {
-        label: 'Flávia',
-        data: [0, 3, 30, 44, 19],
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139,92,246,0.1)',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 4
-      },
-      {
-        label: 'Gonçalo',
-        data: [20, 30, 40, 46, 18],
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16,185,129,0.1)',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 4
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12 } }
-    },
-    scales: {
-      x: { ticks: { font: { size: 10 } } },
-      y: { ticks: { font: { size: 10 } } }
-    }
-  }
-});
+// ─── RENDER ALL ───────────────────────────────────────────────────────────────
+function renderAll(data, fromLive) {
+  const badge = document.getElementById('update-badge');
+  badge.className = 'badge' + (fromLive ? '' : ' error');
+  badge.textContent = fromLive
+    ? `✅ Actualizado: ${new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'})}`
+    : `⚠️ Dados de demonstração`;
 
-// ---- FUNNEL COMPARISON MAY 2026 ----
-new Chart(document.getElementById('funnelChart'), {
-  type: 'bar',
-  data: {
-    labels: ['Leads', 'Contactados', 'Conversas', 'Qualificados', 'Verbal Agr.', 'Won'],
-    datasets: [
-      {
-        label: 'Diogo',
-        data: [109, 75, 55, 26, 5, 24],
-        backgroundColor: '#3b82f6'
-      },
-      {
-        label: 'Flávia',
-        data: [113, 101, 64, 8, 0, 19],
-        backgroundColor: '#8b5cf6'
-      },
-      {
-        label: 'Gonçalo',
-        data: [104, 90, 53, 6, 2, 18],
-        backgroundColor: '#10b981'
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12 } }
-    },
-    scales: {
-      x: { ticks: { font: { size: 9 } } },
-      y: { ticks: { font: { size: 10 } } }
-    }
-  }
-});
+  renderKPIs(data);
+  renderSpCards(data);
+  renderActivityTable(data);
+  renderMonthlyTable(data);
+  renderYtdFunnels(data);
+  renderCommissionDetail();
+  renderCharts(data);
+
+  document.getElementById('loading-overlay').style.display = 'none';
+}
+
+// ─── KPI CARDS ────────────────────────────────────────────────────────────────
+function renderKPIs(data) {
+  const d = data.optmax, y = data.ytd;
+  const diogoRev  = safeGet(d,'diogo','revenue','result') || 0;
+  const flaviaRev = safeGet(d,'flavia','revenue','result') || 0;
+  const gonRev    = safeGet(d,'goncalo','revenue','result') || 0;
+  const monthRev  = diogoRev + flaviaRev + gonRev;
+  const diogoYtd  = safeGet(y,'diogo','ytd','revenue') || 0;
+  const flaviaYtd = safeGet(y,'flavia','ytd','revenue') || 0;
+  const gonYtd    = safeGet(y,'goncalo','ytd','revenue') || 0;
+  const diogoWon  = safeGet(y,'diogo','ytd','won') || 0;
+  const flaviaWon = safeGet(y,'flavia','ytd','won') || 0;
+  const gonWon    = safeGet(y,'goncalo','ytd','won') || 0;
+
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi-card blue"><div class="kpi-label">Revenue NB — YTD</div><div class="kpi-value">${eur(Math.round((diogoYtd+flaviaYtd+gonYtd)/1000)+'K')}</div><div class="kpi-sub">Diogo ${eur(Math.round(diogoYtd/1000)+'K')} · Gonçalo ${eur(Math.round(gonYtd/1000)+'K')} · Flávia ${eur(Math.round(flaviaYtd/1000)+'K')}</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Deals Ganhos — YTD NB</div><div class="kpi-value">${fmt(diogoWon+flaviaWon+gonWon)}</div><div class="kpi-sub">Diogo ${diogoWon} · Gonçalo ${gonWon} · Flávia ${flaviaWon}</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Comissões — YTD</div><div class="kpi-value">€ 5 334</div><div class="kpi-sub">Diogo €4 291 · Gonçalo €623 · Flávia €420</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Revenue NB — Maio</div><div class="kpi-value">${eur(monthRev)}</div><div class="kpi-sub">vs Meta €27 000 &nbsp;<span class="${pct(monthRev,27000)>=60?'up':'down'}">${pct(monthRev,27000)}% atingido</span></div></div>
+    <div class="kpi-card red"><div class="kpi-label">Meta individual — Maio</div><div class="kpi-value">€ 9 000</div><div class="kpi-sub">Por vendedor · Diogo ${pct(diogoRev,9000)}% · Flávia ${pct(flaviaRev,9000)}% · Gonçalo ${pct(gonRev,9000)}%</div></div>`;
+}
+
+// ─── SALESPERSON CARDS ────────────────────────────────────────────────────────
+const PEOPLE = [
+  { key:'diogo',   name:'Diogo Fernandes',  cls:'diogo',   com:'€690.87', level:'C2', avgTicket:'€254.25', conv:'22.02%' },
+  { key:'flavia',  name:'Flávia Campos',    cls:'flavia',  com:'€109.70', level:'C1', avgTicket:'€114.89', conv:'16.81%' },
+  { key:'goncalo', name:'Gonçalo Centeno',  cls:'goncalo', com:'€53.52',  level:'C1', avgTicket:'€55.11',  conv:'17.31%' }
+];
+
+const FUNNEL_LABELS = [
+  { key:'assigned leads', label:'Leads Atrib.', color:'#3b82f6' },
+  { key:'contacted',      label:'Contactados',  color:'#3b82f6' },
+  { key:'conversations',  label:'Conversas',    color:'#60a5fa' },
+  { key:'qualified',      label:'Qualificados', color:'#f59e0b' },
+  { key:'verbal agreement',label:'Verbal Agr.', color:'#ef4444' },
+  { key:'won',            label:'Won',          color:'#10b981' }
+];
+
+function renderSpCards(data) {
+  document.getElementById('sp-grid').innerHTML = PEOPLE.map(p => {
+    const om = data.optmax[p.key] || {};
+    const rev = om['revenue'] || {};
+    const revResult = rev.result || 0;
+    const revGoal   = rev.goal   || 9000;
+    const revPct    = pct(revResult, revGoal);
+
+    const rows = FUNNEL_LABELS.map(f => {
+      const m = om[f.key] || {};
+      const r = m.result || 0;
+      const g = m.goal   || 1;
+      const p2 = pct(r, g);
+      const barW = Math.min(100, p2);
+      return `
+        <div class="funnel-row">
+          <div class="funnel-label">${f.label}</div>
+          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${barW}%;background:${barColor(p2)};"></div></div>
+          <div class="funnel-vals">${fmt(r)} <span class="funnel-goal">/ ${fmt(g)}</span> ${f.key!=='assigned leads'?goalBadge(p2):''}</div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="sp-card">
+        <div class="sp-header ${p.cls}">
+          <div><div class="sp-name">${p.name}</div><div style="font-size:11px;opacity:0.8;margin-top:2px;">${p.level} · Comissão ${p.com}</div></div>
+          <div style="text-align:right"><div style="font-size:18px;font-weight:700;">${eur(revResult)}</div>${goalBadge(revPct)} <span style="font-size:10px;opacity:0.85;">da meta</span></div>
+        </div>
+        <div class="sp-body">
+          ${rows}
+          <div class="divider"></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-top:4px;">
+            <span>Avg Ticket: <strong>${p.avgTicket}</strong> (meta €150)</span>
+            <span>Conversão: <strong>${p.conv}</strong></span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ─── ACTIVITY TABLE ───────────────────────────────────────────────────────────
+function renderActivityTable(data) {
+  const t = data.today;
+  const rows = [
+    { name:'Diogo',   p:'diogo'  },
+    { name:'Flávia',  p:'flavia' },
+    { name:'Gonçalo', p:'goncalo'}
+  ].map(({name,p}) => {
+    const d = t[p] || {};
+    return `
+      <tr><td><strong>${name}</strong></td><td class="td-center" style="color:#10b981;font-weight:600;">Hoje</td><td class="td-right">${d.today_calls||0}</td><td class="td-right">${d.today_wa||0}</td></tr>
+      <tr><td></td><td class="td-center" style="color:#6b7280;">Ontem</td><td class="td-right">${d.yest_calls||0}</td><td class="td-right">${d.yest_wa||0}</td></tr>
+      <tr><td></td><td class="td-center" style="color:#6b7280;">Este Mês</td><td class="td-right"><strong>${d.month_calls||0}</strong></td><td class="td-right"><strong>${d.month_wa||0}</strong></td></tr>
+      <tr><td colspan="4" style="padding:2px 0;"><div class="divider"></div></td></tr>`;
+  }).join('');
+
+  document.getElementById('activity-table').innerHTML = `
+    <table><thead><tr><th>Comercial</th><th class="td-center">Período</th><th class="td-right">Calls</th><th class="td-right">WhatsApp</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+// ─── MONTHLY TABLE ────────────────────────────────────────────────────────────
+function renderMonthlyTable(data) {
+  const months = ['Jan','Fev','Mar','Abr','Mai'];
+  const people = [
+    { key:'diogo',   label:'Diogo',   color:'#1e40af' },
+    { key:'flavia',  label:'Flávia',  color:'#7c3aed' },
+    { key:'goncalo', label:'Gonçalo', color:'#065f46' }
+  ];
+
+  const revRows = people.map(p => {
+    const m = safeGet(data,'ytd',p.key,'monthly','revenue') || Array(12).fill(0);
+    const ytd = safeGet(data,'ytd',p.key,'ytd','revenue') || 0;
+    const cells = months.map((_,i) => `<td class="td-right">${m[i]>0?eur(m[i]):'-'}</td>`).join('');
+    return `<tr><td style="color:${p.color};font-weight:600;">${p.label}</td>${cells}<td class="td-right"><strong>${eur(ytd)}</strong></td></tr>`;
+  }).join('');
+
+  const totals = months.map((_,i) => {
+    const sum = people.reduce((s,p) => s + (safeGet(data,'ytd',p.key,'monthly','revenue')||[])[i]||0, 0);
+    return `<td class="td-right"><strong>${sum>0?eur(sum):'-'}</strong></td>`;
+  }).join('');
+  const totalYtd = people.reduce((s,p) => s + (safeGet(data,'ytd',p.key,'ytd','revenue')||0), 0);
+
+  document.getElementById('monthly-table').innerHTML = `
+    <table>
+      <thead><tr><th>Comercial</th>${months.map(m=>`<th class="td-right">${m}</th>`).join('')}<th class="td-right">YTD</th></tr></thead>
+      <tbody>
+        ${revRows}
+        <tr style="background:#f9fafb;"><td><strong>Total</strong></td>${totals}<td class="td-right"><strong>${eur(totalYtd)}</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="divider" style="margin-top:10px;"></div>
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;margin:6px 0 4px;">Deals Ganhos NB</div>
+    <table>
+      <thead><tr><th>Comercial</th>${months.map(m=>`<th class="td-right">${m}</th>`).join('')}<th class="td-right">YTD</th></tr></thead>
+      <tbody>
+        ${people.map(p => {
+          const m = safeGet(data,'ytd',p.key,'monthly','won') || Array(12).fill(0);
+          const ytd = safeGet(data,'ytd',p.key,'ytd','won') || 0;
+          const cells = months.map((_,i) => `<td class="td-right">${m[i]>0?m[i]:'-'}</td>`).join('');
+          return `<tr><td style="color:${p.color};font-weight:600;">${p.label}</td>${cells}<td class="td-right"><strong>${ytd}</strong></td></tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ─── YTD FUNNELS ──────────────────────────────────────────────────────────────
+function renderYtdFunnels(data) {
+  const configs = [
+    { key:'diogo',   name:'Diogo Fernandes',  color:'#3b82f6', color2:'#60a5fa' },
+    { key:'flavia',  name:'Flávia Campos',    color:'#8b5cf6', color2:'#a78bfa' },
+    { key:'goncalo', name:'Gonçalo Centeno',  color:'#10b981', color2:'#34d399' }
+  ];
+
+  document.getElementById('ytd-funnels').innerHTML = configs.map(cfg => {
+    const om = data.optmax[cfg.key] || {};
+    const base = safeGet(om,'assigned leads','year') || 1;
+
+    const rows = [
+      { label:'Leads Atrib.', key:'assigned leads', color:cfg.color  },
+      { label:'Contactados',  key:'contacted',      color:cfg.color  },
+      { label:'Conversas',    key:'conversations',  color:cfg.color2 },
+      { label:'Qualificados', key:'qualified',      color:'#f59e0b'  },
+      { label:'Verbal Agr.',  key:'verbal agreement',color:'#ef4444' },
+      { label:'Won',          key:'won',            color:'#10b981'  }
+    ].map(r => {
+      const val = safeGet(om, r.key, 'year') || 0;
+      const p2  = Math.round(val/base*100);
+      return `<div class="funnel-row">
+        <div class="funnel-label">${r.label}</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${Math.min(100,p2)}%;background:${r.color};"></div></div>
+        <div class="funnel-vals">${fmt(val)} <span class="funnel-goal">${p2}%</span></div>
+      </div>`;
+    }).join('');
+
+    return `<div class="chart-card"><h3>${cfg.name} — Funil YTD</h3>${rows}</div>`;
+  }).join('');
+}
+
+// ─── COMMISSION DETAIL (STATIC) ───────────────────────────────────────────────
+function renderCommissionDetail() {
+  const people = [
+    { name:'Diogo Fernandes', cls:'diogo', color:'#1e40af', bg:'#eff6ff', border:'#bfdbfe', ytd:'€4 291', level:'C3→C2',
+      q: [{val:'€3 077',nb:'€2 360',ren:'€716',lv:'C3',active:false},{val:'€1 214',nb:'€905',ren:'€310',lv:'C2',active:true}] },
+    { name:'Flávia Campos', cls:'flavia', color:'#7c3aed', bg:'#f5f3ff', border:'#ddd6fe', ytd:'€420', level:'C1',
+      q: [{val:'€156',nb:'€153',ren:'€3',lv:'C1',active:false},{val:'€264',nb:'€261',ren:'€3',lv:'C1',active:true}] },
+    { name:'Gonçalo Centeno', cls:'goncalo', color:'#065f46', bg:'#ecfdf5', border:'#a7f3d0', ytd:'€623', level:'C1',
+      q: [{val:'€376',nb:'€364',ren:'€12',lv:'C1',active:false},{val:'€247',nb:'€235',ren:'€12',lv:'C1',active:true}] }
+  ];
+
+  document.getElementById('commission-detail').innerHTML = people.map(p => `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:12px;font-weight:700;color:${p.color};">${p.name}</span>
+        <span style="font-size:11px;color:#6b7280;">Total YTD: <strong>${p.ytd}</strong></span>
+      </div>
+      <div class="q-grid">
+        ${p.q.map((q,i) => `
+          <div class="q-box ${q.active?'':'future'}" style="background:${p.bg};${q.active?`border:1px solid ${p.border}`:``}">
+            <div class="q-period">Q${i+1}${q.active?' <span style="color:#f59e0b;">▶</span>':''}</div>
+            <div class="q-val" style="color:${p.color};">${q.val}</div>
+            <div class="q-detail">NB ${q.nb} · Ren. ${q.ren}</div>
+            <span class="level level-${q.lv.toLowerCase()}" style="margin-top:4px;display:inline-block;">${q.lv}</span>
+          </div>`).join('')}
+        <div class="q-box future" style="background:#f9fafb;"><div class="q-period">Q3</div><div class="q-val" style="color:#9ca3af;">—</div><div class="q-detail" style="color:#9ca3af;">Jul·Ago·Set</div></div>
+        <div class="q-box future" style="background:#f9fafb;"><div class="q-period">Q4</div><div class="q-val" style="color:#9ca3af;">—</div><div class="q-detail" style="color:#9ca3af;">Out·Nov·Dez</div></div>
+      </div>
+    </div>`).join('');
+
+  // Static commission table
+  document.getElementById('commission-table').innerHTML = `
+    <table>
+      <thead><tr><th>Comercial</th><th>Nível</th><th class="td-right">NB</th><th class="td-right">Ren.</th><th class="td-right">Total</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Diogo</strong></td><td><span class="level level-c2">C2</span></td><td class="td-right">€3 265</td><td class="td-right">€1 026</td><td class="td-right"><strong>€4 291</strong></td></tr>
+        <tr><td><strong>Gonçalo</strong></td><td><span class="level level-c1">C1</span></td><td class="td-right">€600</td><td class="td-right">€23</td><td class="td-right"><strong>€623</strong></td></tr>
+        <tr><td><strong>Flávia</strong></td><td><span class="level level-c1">C1</span></td><td class="td-right">€415</td><td class="td-right">€6</td><td class="td-right"><strong>€420</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="divider" style="margin-top:8px;"></div>
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;margin:6px 0 4px;">Eficiência Laboral (Rev/€ salário)</div>
+    <table>
+      <thead><tr><th>Comercial</th><th class="td-right">Jan</th><th class="td-right">Fev</th><th class="td-right">Mar</th><th class="td-right">Abr</th><th class="td-right">Mai</th></tr></thead>
+      <tbody>
+        <tr><td>Diogo</td><td class="td-right">12.2</td><td class="td-right">13.6</td><td class="td-right">23.6</td><td class="td-right">17.6</td><td class="td-right" style="color:#ef4444;font-weight:600;">7.6</td></tr>
+        <tr><td>Gonçalo</td><td class="td-right">0.9</td><td class="td-right">1.7</td><td class="td-right">2.9</td><td class="td-right">3.1</td><td class="td-right">1.2</td></tr>
+        <tr><td>Flávia</td><td class="td-right">0.0</td><td class="td-right">0.1</td><td class="td-right">1.7</td><td class="td-right">1.7</td><td class="td-right">1.0</td></tr>
+      </tbody>
+    </table>`;
+}
+
+// ─── CHARTS ───────────────────────────────────────────────────────────────────
+function renderCharts(data) {
+  const months = ['Jan','Fev','Mar','Abr','Mai'];
+  const dRev = (safeGet(data,'ytd','diogo','monthly','revenue')   || Array(12).fill(0)).slice(0,5);
+  const fRev = (safeGet(data,'ytd','flavia','monthly','revenue')  || Array(12).fill(0)).slice(0,5);
+  const gRev = (safeGet(data,'ytd','goncalo','monthly','revenue') || Array(12).fill(0)).slice(0,5);
+  const dWon = (safeGet(data,'ytd','diogo','monthly','won')       || Array(12).fill(0)).slice(0,5);
+  const fWon = (safeGet(data,'ytd','flavia','monthly','won')      || Array(12).fill(0)).slice(0,5);
+  const gWon = (safeGet(data,'ytd','goncalo','monthly','won')     || Array(12).fill(0)).slice(0,5);
+
+  Object.values(charts).forEach(c => c.destroy());
+  charts = {};
+
+  charts.revenue = new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: { labels: months, datasets: [
+      { label:'Diogo (NB)',   data:dRev, backgroundColor:'#3b82f6', stack:'nb' },
+      { label:'Flávia (NB)',  data:fRev, backgroundColor:'#8b5cf6', stack:'nb' },
+      { label:'Gonçalo (NB)', data:gRev, backgroundColor:'#10b981', stack:'nb' },
+      { label:'Meta NB', data:[5400,5400,5400,5400,27000], type:'line', borderColor:'#ef4444', borderDash:[4,4], pointRadius:4, fill:false, tension:0, stack:undefined, order:-1 }
+    ]},
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom',labels:{font:{size:10},boxWidth:12}}, tooltip:{callbacks:{label:c=>`${c.dataset.label}: €${c.parsed.y.toLocaleString('pt-PT')}`}} }, scales:{ x:{stacked:true,ticks:{font:{size:10}}}, y:{stacked:true,ticks:{font:{size:10},callback:v=>'€'+(v/1000).toFixed(0)+'K'}} } }
+  });
+
+  const dYtd = safeGet(data,'ytd','diogo','ytd','revenue') || 0;
+  const fYtd = safeGet(data,'ytd','flavia','ytd','revenue') || 0;
+  const gYtd = safeGet(data,'ytd','goncalo','ytd','revenue') || 0;
+  charts.mix = new Chart(document.getElementById('mixChart'), {
+    type: 'doughnut',
+    data: { labels:['NB Diogo','NB Flávia','NB Gonçalo','Ren. Diogo','Ren. Gonçalo','Ren. Flávia'],
+      datasets:[{ data:[dYtd,fYtd,gYtd,205158,9212,2225], backgroundColor:['#3b82f6','#8b5cf6','#10b981','#93c5fd','#6ee7b7','#c4b5fd'], borderWidth:1 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right',labels:{font:{size:9},boxWidth:10,padding:6}}, tooltip:{callbacks:{label:c=>`${c.label}: €${c.parsed.toLocaleString('pt-PT')}`}} } }
+  });
+
+  charts.deals = new Chart(document.getElementById('dealsChart'), {
+    type: 'line',
+    data: { labels:months, datasets:[
+      { label:'Diogo',   data:dWon, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.1)', fill:true, tension:0.3, pointRadius:4 },
+      { label:'Flávia',  data:fWon, borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,0.1)', fill:true, tension:0.3, pointRadius:4 },
+      { label:'Gonçalo', data:gWon, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.1)', fill:true, tension:0.3, pointRadius:4 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:12}}}, scales:{x:{ticks:{font:{size:10}}},y:{ticks:{font:{size:10}}}} }
+  });
+
+  const om = data.optmax;
+  charts.funnel = new Chart(document.getElementById('funnelChart'), {
+    type: 'bar',
+    data: { labels:['Leads','Contactados','Conversas','Qualificados','Verbal Agr.','Won'],
+      datasets:[
+        { label:'Diogo',   data:['assigned leads','contacted','conversations','qualified','verbal agreement','won'].map(k=>safeGet(om,'diogo',k,'result')||0), backgroundColor:'#3b82f6' },
+        { label:'Flávia',  data:['assigned leads','contacted','conversations','qualified','verbal agreement','won'].map(k=>safeGet(om,'flavia',k,'result')||0), backgroundColor:'#8b5cf6' },
+        { label:'Gonçalo', data:['assigned leads','contacted','conversations','qualified','verbal agreement','won'].map(k=>safeGet(om,'goncalo',k,'result')||0), backgroundColor:'#10b981' }
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:12}}}, scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:10}}}} }
+  });
+
+  charts.commissionQ = new Chart(document.getElementById('commissionQChart'), {
+    type:'bar',
+    data:{ labels:['Q1','Q2 (parcial)','Q3','Q4'], datasets:[
+      {label:'Diogo — NB',    data:[2360.25,904.70,0,0], backgroundColor:'#3b82f6', stack:'d'},
+      {label:'Diogo — Ren.',  data:[716.26,309.53,0,0],  backgroundColor:'#93c5fd', stack:'d'},
+      {label:'Flávia — NB',   data:[153.35,261.20,0,0],  backgroundColor:'#8b5cf6', stack:'f'},
+      {label:'Flávia — Ren.', data:[2.73,2.83,0,0],      backgroundColor:'#c4b5fd', stack:'f'},
+      {label:'Gonçalo — NB',  data:[364.46,235.27,0,0],  backgroundColor:'#10b981', stack:'g'},
+      {label:'Gonçalo — Ren.',data:[11.53,11.51,0,0],    backgroundColor:'#6ee7b7', stack:'g'}
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom',labels:{font:{size:9},boxWidth:10,padding:5}}, tooltip:{callbacks:{label:c=>`${c.dataset.label}: €${c.parsed.y.toLocaleString('pt-PT',{minimumFractionDigits:2})}`}} }, scales:{ x:{stacked:true,ticks:{font:{size:10}}}, y:{stacked:true,ticks:{font:{size:10},callback:v=>'€'+v.toLocaleString('pt-PT')}} } }
+  });
+}
+
+// ─── ARRANQUE ─────────────────────────────────────────────────────────────────
+loadDashboard();
 </script>
 </body>
 </html>
