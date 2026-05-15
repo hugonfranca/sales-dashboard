@@ -319,21 +319,20 @@ function renderSpCards(data) {
     const revGoal   = rev.goal   || 9000;
     const revPct    = pct(revResult, revGoal);
 
-    // O goal de cada etapa é o valor da etapa anterior (conversão do funil)
-    // Se o script devolver goal=0, calculamos a partir do resultado anterior
+    // O denominador de cada etapa é SEMPRE o resultado da etapa anterior
     const rows = FUNNEL_LABELS.map((f, idx) => {
       const m = om[f.key] || {};
       const r = m.result || 0;
-      // goal: usa o do script; se 0 e não for a 1ª etapa, usa o resultado anterior
       const prevKey = idx > 0 ? FUNNEL_LABELS[idx - 1].key : null;
-      const prevResult = prevKey ? (om[prevKey]?.result || 0) : 0;
-      const g = (m.goal > 0) ? m.goal : (idx === 0 ? r : prevResult);
-      const hasGoal = g > 0 && idx > 0; // 1ª etapa (assigned leads) não mostra %
+      const g = prevKey ? (om[prevKey]?.result || 0) : r; // etapa anterior; 1ª usa o próprio valor
+      const hasGoal = g > 0 && idx > 0;
       const p2 = hasGoal ? pct(r, g) : 0;
       const barW = hasGoal ? Math.min(100, p2) : 0;
       const goalStr = idx === 0
         ? `<span class="funnel-goal">/ ${fmt(g)}</span>`
-        : `<span class="funnel-goal">/ ${fmt(g)}</span> ${goalBadge(p2)}`;
+        : g > 0
+          ? `<span class="funnel-goal">/ ${fmt(g)}</span> ${goalBadge(p2)}`
+          : `<span class="funnel-goal" style="color:#d1d5db;">/ —</span>`;
       return `
         <div class="funnel-row">
           <div class="funnel-label">${f.label}</div>
